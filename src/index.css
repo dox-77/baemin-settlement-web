@@ -1,5 +1,18 @@
+
 body {
-  font-family: sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
   background: #f9fafb;
-  padding: 20px;
+  padding: 30px;
+  color: #111827;
+}
+table {
+  border-collapse: collapse;
+}
+th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
 }

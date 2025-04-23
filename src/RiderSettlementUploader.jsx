@@ -25,6 +25,10 @@ export default function RiderSettlementUploader() {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  const numberWithCommas = (x) => {
+    return x.toLocaleString();
+  };
+
   const calculateSettlement = (rows) => {
     const result = [];
     const grouped = {};
@@ -65,7 +69,7 @@ export default function RiderSettlementUploader() {
         정산금액: Math.round(정산금액),
         소득세: Math.round(소득세),
         주민세: Math.round(주민세),
-        원천징수,
+        원천징수: Math.round(원천징수),
         지급금액: Math.round(지급금액),
       });
     });
@@ -73,34 +77,69 @@ export default function RiderSettlementUploader() {
     return result;
   };
 
+  const downloadExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "정산결과");
+    XLSX.writeFile(wb, "배민커넥트_정산결과.xlsx");
+  };
+
   return (
-    <div className="p-4 space-y-4">
-      <div {...getRootProps()} style={{ border: "2px dashed gray", padding: "20px", borderRadius: "10px", textAlign: "center" }}>
+    <div>
+      <img src="/logo.png" alt="logo" style={{ height: 60, marginBottom: 20 }} />
+      <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: 20 }}>
+        배달처리비 엑셀 파일을 업로드해주세요
+      </h2>
+
+      <div {...getRootProps()} style={{
+        border: "2px dashed #60a5fa",
+        padding: "20px",
+        borderRadius: "10px",
+        background: "#f0f9ff",
+        marginBottom: "20px"
+      }}>
         <input {...getInputProps()} />
-        <p>배달처리비 엑셀 파일을 업로드해주세요</p>
+        <p style={{ textAlign: "center", color: "#3b82f6" }}>
+          여기에 파일을 드래그하거나 클릭하여 업로드
+        </p>
       </div>
 
       {data.length > 0 && (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
-            <thead>
-              <tr>
-                {Object.keys(data[0]).map((key) => (
-                  <th key={key} style={{ border: "1px solid #ddd", padding: "8px", background: "#f0f0f0" }}>{key}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, i) => (
-                <tr key={i}>
-                  {Object.values(row).map((val, j) => (
-                    <td key={j} style={{ border: "1px solid #ddd", padding: "8px", textAlign: "right" }}>{val}</td>
+        <>
+          <button onClick={downloadExcel} style={{
+            background: "#2563eb",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            border: "none"
+          }}>
+            엑셀 다운로드
+          </button>
+
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%" }}>
+              <thead>
+                <tr>
+                  {Object.keys(data[0]).map((key) => (
+                    <th key={key}>{key}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {data.map((row, i) => (
+                  <tr key={i}>
+                    {Object.values(row).map((val, j) => (
+                      <td key={j} style={{ textAlign: "right" }}>
+                        {typeof val === "number" ? numberWithCommas(val) : val}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );
